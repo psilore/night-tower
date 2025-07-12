@@ -1,4 +1,4 @@
-# Homelab
+# Night Tower
 
 ![tower](/docs/images/tower.png)
 
