@@ -1,0 +1,28 @@
+services:
+  tailscale-homepage:
+    image: tailscale/tailscale:latest
+    container_name: tailscale-homepage
+    hostname: homepage
+    environment:
+      - TS_AUTHKEY=<TAILSCALE_AUTH_KEY>
+      - "TS_EXTRA_ARGS=--advertise-tags=tag:node --reset"
+      - TS_SERVE_CONFIG=/config/homepage.json
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+    volumes:
+      - ${PWD}/state:/var/lib/tailscale
+      - ${PWD}/config:/config
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+    restart: unless-stopped
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    network_mode: service:tailscale-homepage
+    volumes:
+      - ${PWD}/config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: gethomepage.dev
