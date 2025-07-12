@@ -1,0 +1,12 @@
+name: <your project name>
+services:
+    logseq-webapp:
+        ports:
+            - 8443:443
+        volumes:
+        
+        image: ghcr.io/logseq/logseq-webapp:latest
+volumes:
+    "`pwd`":
+        external: true
+        name: "`pwd`"

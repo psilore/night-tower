@@ -1,0 +1,34 @@
+services:  
+  tailscale-uptime-kuma:
+    image: tailscale/tailscale:latest
+    container_name: tailscale-uptime-kuma
+    hostname: uptime-kuma
+    environment:
+      - TS_AUTHKEY=<TAILSCALE_AUTH_KEY>
+      - "TS_EXTRA_ARGS=--advertise-tags=tag:node --reset"
+      - TS_SERVE_CONFIG=/config/portainer.json
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+    volumes:
+      - ${PWD}/state:/var/lib/tailscale
+      - ${PWD}/config:/config
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+    restart: unless-stopped
+  uptime-kuma:
+    container_name: uptime-kuma
+    network_mode: service:tailscale-uptime-kuma
+    depends_on:
+      - tailscale-uptime-kuma
+    restart: unless-stopped
+    volumes:
+      - uptime_kuma_data:/app/data
+    image: louislam/uptime-kuma:1
+
+volumes:
+  uptime_kuma_data:
+    driver: local
+  tailscale-uptime-kuma:
+    driver: local
