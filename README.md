@@ -10,4 +10,4 @@ Pattern: `<service-name>.<funny-name>.ts.net`
 
 ## Rack
 
-![my rack](/docs/images/mate.png)
+![my rack](/docs/images/rack.png)
