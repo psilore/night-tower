@@ -1,0 +1,33 @@
+services:
+  tailscale-grafana:
+    image: tailscale/tailscale:latest
+    container_name: tailscale-grafana
+    hostname: grafana
+    environment:
+      - TS_AUTHKEY=<TAILSCALE_AUTH_KEY>
+      - "TS_EXTRA_ARGS=--advertise-tags=tag:node --reset"
+      - TS_SERVE_CONFIG=/config/grafana.json
+      - TS_STATE_DIR=/var/lib/tailscale
+      - TS_USERSPACE=false
+    volumes:
+      - ${PWD}/state:/var/lib/tailscale
+      - ${PWD}/config:/config
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - net_admin
+    restart: unless-stopped
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    network_mode: service:tailscale-grafana
+    volumes:
+      - ${PWD}/config:/var/lib/grafana
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: <GRAFANA_ADMIN_PASSWORD>
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      - tailscale-grafana
