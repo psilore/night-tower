@@ -10,7 +10,7 @@ Pattern: `<service-name>.<funny-name>.ts.net`
 
 ## Dashboard
 
-![my dashboard](/docs/images/dashboard.png)
+![my dashboard](/docs/images/dashboard-night-tower.png)
 
 ## Rack
 
