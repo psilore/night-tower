@@ -1,0 +1,21 @@
+name: Release
+
+on:
+  workflow_run:
+    workflows: ["Deploy"]
+    types:
+      - 'completed'
+
+permissions:
+  actions: 'read'
+  security-events: 'write'
+  contents: 'write'
+  id-token: 'write'
+  checks: 'write'
+  issues: 'write'
+  pull-requests: 'write'
+
+jobs:
+  release:
+    if: ${{ always() && github.event.workflow_run.conclusion == 'success' }}
+    uses: ./.github/workflows/semantic-release.yaml
