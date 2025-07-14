@@ -1,0 +1,61 @@
+name: Semantic Release
+
+on:
+  workflow_call:
+
+permissions:
+  actions: 'read'
+  security-events: 'write'
+  contents: 'write'
+  id-token: 'write'
+  checks: 'write'
+  issues: 'write'
+  pull-requests: 'write'
+
+jobs:
+  semantic-release:
+    runs-on: ubuntu-24.04
+    outputs:
+      new_release_published: ${{ steps.semantic-release.outputs.new_release_published }}
+      new_release_version: ${{ steps.semantic-release.outputs.new_release_version }}
+      new_release_notes: ${{ steps.semantic-release.outputs.new_release_notes }}
+      new_release_major_version: ${{ steps.semantic-release.outputs.new_release_major_version }}
+      new_release_minor_version: ${{ steps.semantic-release.outputs.new_release_minor_version }}
+      new_release_patch_version: ${{ steps.semantic-release.outputs.new_release_patch_version }}
+      last_release_version: ${{ steps.semantic-release.outputs.last_release_version }}
+      short-sha: ${{ env.GITHUB_SHA_SHORT }}
+      ref-slug: ${{ env.GITHUB_REF_SLUG_URL }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Slugify github variables
+        uses: rlespinasse/github-slug-action@955b5ba4560860f8a633bd24190941f16016e42c
+
+      - name: Semanitic Release
+        uses: cycjimmy/semantic-release-action@16ca923e6ccbb50770c415a0ccd43709a8c5f7a4
+        id: semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          semantic_version: v24.2.1
+          extra_plugins: |
+            @semantic-release/git@10.0.1
+            @semantic-release/changelog@6.0.3
+            @semantic-release/exec@7.0.2
+            conventional-changelog-conventionalcommits@8.0.0
+
+      - name: Success summary
+        if: ${{ steps.semantic-release.outputs.new_release_published == 'true' }}
+        run: |
+          echo "
+          ### :bookmark: ✅ New release created (${{ steps.semantic-release.outputs.new_release_version }})
+
+          **Release Notes:**
+
+          ${{ steps.semantic-release.outputs.new_release_notes }}
+          " >> $GITHUB_STEP_SUMMARY

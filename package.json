@@ -1,0 +1,17 @@
+{
+  "name": "night-tower",
+  "version": "1.0.0",
+  "description": "Collection of docs for my homelab",
+  "private": true,
+  "scripts": {
+    "lint:markdown": "markdownlint '**/*.md' --ignore node_modules",
+    "lint:yaml": "yamllint ./services/**/*.yaml"
+  },
+  "author": "Erik Emmerfors",
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "markdownlint-cli": "^0.45.0",
+    "yaml-lint": "^1.7.0"
+  }
+}

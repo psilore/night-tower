@@ -17,17 +17,41 @@ services:
     cap_add:
       - net_admin
     restart: unless-stopped
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    volumes:
+      - loki_data:/loki
+      - ${PWD}/config/loki-config.yaml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    restart: unless-stopped
+    volumes:
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ${PWD}/config/promtail-config.yaml:/etc/promtail/config.yaml
+    command: -config.file=/etc/promtail/config.yaml
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
+    restart: unless-stopped
     network_mode: service:tailscale-grafana
     volumes:
-      - ${PWD}/config:/var/lib/grafana
-      - /var/run/docker.sock:/var/run/docker.sock
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
     environment:
-      GF_SECURITY_ADMIN_PASSWORD: <GRAFANA_ADMIN_PASSWORD>
-    ports:
-      - "3000:3000"
-    restart: unless-stopped
-    depends_on:
-      - tailscale-grafana
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=your_secure_grafana_password
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+volumes:
+  loki_data:
+    driver: local
+  grafana_data:
+    driver: local
+  tailscale-grafana:
+    driver: local
