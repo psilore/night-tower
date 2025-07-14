@@ -10,8 +10,10 @@
 
 4. Create "Scheduled task/User-defined script"
 
-5. In "General/settings" tab, enter **Task** name: `<service-name>` and choose **Root** user
+5. In "General/settings" tab, enter **Task** name: `<service-name>` and
+   choose **Root** user
 
-6. In "Schedule/date" tab, check **Run on the following date**, start: 20250330, repeat: Do not repeat
+6. In "Schedule/date" tab
+   check **Run on the following date**, start: 20250330, repeat: Do not repeat
 
 7. In "Task settings" tab, add script to install `<service-name>`.
