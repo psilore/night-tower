@@ -1,0 +1,2 @@
+[host]
+<host-name> ansible_user=<user>
