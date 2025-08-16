@@ -1,0 +1,41 @@
+---
+- name: Cleanup unused Docker resources
+  hosts: night_tower
+  become: true
+
+  tasks:
+    - name: Prune all unused containers
+      ansible.builtin.command: docker container prune -f
+      register: container_prune_output
+      changed_when: "'Total reclaimed space' in container_prune_output.stdout"
+
+    - name: Display container cleanup stats
+      ansible.builtin.debug:
+        msg: "{{ container_prune_output.stdout }}"
+
+    - name: Prune all unused networks
+      ansible.builtin.command: docker network prune -f
+      register: network_prune_output
+      changed_when: "'Total reclaimed space' in network_prune_output.stdout"
+
+    - name: Display network cleanup stats
+      ansible.builtin.debug:
+        msg: "{{ network_prune_output.stdout }}"
+
+    - name: Prune all unused images
+      ansible.builtin.command: docker image prune -a -f
+      register: image_prune_output
+      changed_when: "'Total reclaimed space' in image_prune_output.stdout"
+
+    - name: Display image cleanup stats
+      ansible.builtin.debug:
+        msg: "{{ image_prune_output.stdout }}"
+
+    - name: Prune all unused volumes
+      ansible.builtin.command: docker volume prune -f
+      register: volume_prune_output
+      changed_when: "'Total reclaimed space' in volume_prune_output.stdout"
+
+    - name: Display volume cleanup stats
+      ansible.builtin.debug:
+        msg: "{{ volume_prune_output.stdout }}"

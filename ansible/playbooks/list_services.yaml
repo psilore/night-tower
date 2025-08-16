@@ -1,0 +1,16 @@
+---
+- name: Find and list directories
+  hosts: night_tower
+  become: true
+  tasks:
+    - name: Get directories
+      ansible.builtin.find:
+        paths: /opt/
+        file_type: directory
+        recurse: no
+      register: opt_dirs
+
+    - name: List directories
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop: "{{ opt_dirs.files | map(attribute='path') | list }}"

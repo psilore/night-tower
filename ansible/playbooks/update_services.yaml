@@ -1,0 +1,19 @@
+---
+- name: Update services
+  hosts: night_tower
+  become: true
+  vars:
+    docker_services:
+      - immich
+      - home-assistant
+      - portainer
+      - grafana
+      - uptime-kuma
+      - homepage
+      - pi-hole
+  tasks:
+    - name: Update
+      ansible.builtin.shell: cd /opt/{{ item }} && docker-compose pull && docker-compose up -d
+      args:
+        chdir: /opt/{{ item }}
+      loop: "{{ docker_services }}"
