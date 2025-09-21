@@ -1,4 +1,5 @@
-services:  
+---
+services:
   tailscale-immich:
     image: tailscale/tailscale:latest
     container_name: tailscale-immich

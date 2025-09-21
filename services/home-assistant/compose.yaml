@@ -1,13 +1,13 @@
 ---
 services:
-  tailscale-portainer-ce:
+  tailscale-home-assistant:
     image: tailscale/tailscale:latest
-    container_name: tailscale-portainer-ce
-    hostname: portainer
+    container_name: tailscale-home-assistant
+    hostname: home-assistant
     environment:
       - TS_AUTHKEY=<TAILSCALE_AUTH_KEY>
       - "TS_EXTRA_ARGS=--advertise-tags=tag:node --reset"
-      - TS_SERVE_CONFIG=/config/portainer.json
+      - TS_SERVE_CONFIG=/config/home-assistant.json
       - TS_STATE_DIR=/var/lib/tailscale
       - TS_USERSPACE=false
     volumes:
@@ -18,21 +18,18 @@ services:
     cap_add:
       - net_admin
     restart: unless-stopped
-  portainer-ce:
-    container_name: portainer-ce
-    network_mode: service:tailscale-portainer-ce
-    restart: unless-stopped
-    depends_on:
-      - tailscale-portainer-ce
+  home-assistant:
+    container_name: homeassistant
+    image: ghcr.io/home-assistant/home-assistant:stable
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
-    image: portainer/portainer-ce:lts
-    environment:
-      - TZ=Europe/Stockholm
+      - ${PWD}/config:/config
+      - /etc/localtime:/etc/localtime:ro
+      - /run/dbus:/run/dbus:ro
+    restart: unless-stopped
+    privileged: true
 
 volumes:
-  portainer_data:
+  home-assistant:
     driver: local
   tailscale-portainer-ce:
     driver: local

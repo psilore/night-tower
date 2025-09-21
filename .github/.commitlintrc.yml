@@ -1,0 +1,27 @@
+---
+extends:
+  - "@commitlint/config-conventional"
+
+ignores:
+  - "/Signed-off-by: dependabot\\[bot\\]/m"
+  - "/^Merge /"
+  - "/^Revert /"
+
+rules:
+  body-max-line-length:
+    - 2
+    - "always"
+    - 300
+  type-empty:
+    - 0
+    - "never"
+  subject-empty:
+    - 0
+    - "never"
+  header-max-length:
+    - 0
+    - "always"
+    - 0
+  scope-empty:
+    - 0
+    - "never"
