@@ -33,7 +33,7 @@ jobs:
           configFile: >-
             ${{
               inputs.commitlint-config ||
-              '.github/settings/commitlintrc.yml'
+              '.github/commitlintrc.yml'
             }}
 
   validate-yaml:
@@ -48,6 +48,6 @@ jobs:
         run: |
           CONFIG="${{ inputs.yamllint-config }}"
           if [ -z "$CONFIG" ]; then
-            CONFIG=".github/settings/.yamllint.yml"
+            CONFIG=".github/yamllintrc.yml"
           fi
           docker run --rm -v $(pwd):/data cytopia/yamllint . -c "$CONFIG"
