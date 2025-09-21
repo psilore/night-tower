@@ -51,3 +51,6 @@ jobs:
             CONFIG=".github/yamllintrc.yml"
           fi
           docker run --rm -v $(pwd):/data cytopia/yamllint . -c "$CONFIG"
+          if [ $? -eq 0 ]; then
+            echo "Lint free! 🎉"
+          fi
