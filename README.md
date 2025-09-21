@@ -28,5 +28,3 @@ Heavily influenced by, and maybe not in order...sorry
 - [Tailscale dev](https://github.com/tailscale-dev)
 - [Tailscale](https://github.com/tailscale)
 - [Christian Lempa](https://github.com/christianlempa)
-
-## Test
