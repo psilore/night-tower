@@ -7,7 +7,7 @@ name: Source protection
         required: false
         type: string
         description: "The path to the commitlint configuration file (optional)"
-        default: '.github/.commitlintrc.yml'
+        default: '.github/commitlint.config.cjs'
       yamllint-config:
         required: false
         type: string
@@ -33,7 +33,7 @@ jobs:
           configFile: >-
             ${{
               inputs.commitlint-config ||
-              '.github/commitlintrc.yml'
+              '.github/commitlint.config.cjs'
             }}
 
   validate-yaml:

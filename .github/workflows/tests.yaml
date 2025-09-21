@@ -13,5 +13,5 @@ jobs:
   source-protection:
     uses: ./.github/workflows/source-protection.yaml
     with:
-      commitlint-config: '.github/.commitlintrc.yml'
+      commitlint-config: '.github/commitlint.config.cjs'
       yamllint-config: '.github/.yamllintrc.yml'
