@@ -1,6 +1,42 @@
 {
   "plugins": [
-    "@semantic-release/commit-analyzer",
+    [
+      "@semantic-release/commit-analyzer",
+      {
+        "preset": "conventionalcommits",
+        "releaseRules": [
+          {
+            "type": "add",
+            "release": "minor"
+          },
+          {
+            "type": "feat",
+            "release": "minor"
+          },
+          {
+            "type": "fix",
+            "release": "patch"
+          },
+          {
+            "type": "security",
+            "release": "patch"
+          },
+          {
+            "type": "refactor",
+            "release": "patch"
+          },
+          {
+            "type": "chore",
+            "release": "patch"
+          },
+          {
+            "type": "docs",
+            "scope": "README",
+            "release": "patch"
+          }
+        ]
+      }
+    ],
     [
       "@semantic-release/release-notes-generator",
       {
@@ -54,10 +90,16 @@
     "@semantic-release/changelog",
     "@semantic-release/github",
     [
+      "@semantic-release/exec",
+      {
+        "prepareCmd": "echo ${nextRelease.version} > VERSION"
+      }
+    ],
+    [
       "@semantic-release/git",
       {
         "assets": [
-          "package.json",
+          "VERSION",
           "CHANGELOG.md"
         ],
         "message": "chore(release): ${nextRelease.version}\n\n${nextRelease.notes}"

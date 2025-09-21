@@ -1,3 +1,4 @@
+---
 volumes:
   n8n_storage:
   postgres_storage:
@@ -9,7 +10,6 @@ networks:
 
 x-n8n: &service-n8n
   image: n8nio/n8n:latest
-  networks: ['n8n']
   environment:
     - DB_TYPE=postgresdb
     - DB_POSTGRESDB_HOST=postgres
@@ -17,6 +17,9 @@ x-n8n: &service-n8n
     - DB_POSTGRESDB_PASSWORD=${POSTGRES_PASSWORD}
     - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
     - N8N_USER_MANAGEMENT_JWT_SECRET=${N8N_USER_MANAGEMENT_JWT_SECRET}
+    - N8N_METRICS=true
+    - N8N_METRICS_INCLUDE_QUEUE_METRICS=true
+    - N8N_METRICS_QUEUE_METRICS_INTERVAL=30
     - OLLAMA_HOST=ollama:11434
   env_file:
     - .env
@@ -49,6 +52,7 @@ services:
     image: tailscale/tailscale:latest
     container_name: tailscale-n8n
     hostname: n8n
+    networks: ['n8n']
     environment:
       - TS_AUTHKEY=<TAILSCALE_AUTH_KEY>
       - "TS_EXTRA_ARGS=--advertise-tags=tag:node --reset"
@@ -63,6 +67,11 @@ services:
     cap_add:
       - net_admin
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "tailscale", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   postgres:
     image: postgres:16-alpine
     hostname: postgres
@@ -75,7 +84,10 @@ services:
     volumes:
       - postgres_storage:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      test: [
+        'CMD-SHELL',
+        'pg_isready -h localhost -U ${POSTGRES_USER} -d ${POSTGRES_DB}'
+      ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -83,10 +95,13 @@ services:
     <<: *service-n8n
     hostname: n8n-import
     container_name: n8n-import
+    networks: ['n8n']
     entrypoint: /bin/sh
     command:
       - "-c"
-      - "n8n import:credentials --separate --input=/data/credentials && n8n import:workflow --separate --input=/data/workflows"
+      - >-
+        n8n import:credentials --separate --input=/data/credentials &&
+        n8n import:workflow --separate --input=/data/workflows
     volumes:
       - ./n8n/data:/data
     depends_on:
@@ -109,11 +124,6 @@ services:
         condition: service_completed_successfully
       tailscale-n8n:
         condition: service_healthy
-    logging:
-      driver: loki
-      options:
-        loki-url: http://promtail:3100/api/v1/push
-        loki-external-labels: job=${COMPOSE_PROJECT_NAME:-n8n-stack},container_name={{.Name}}
   qdrant:
     image: qdrant/qdrant
     hostname: qdrant
@@ -165,4 +175,4 @@ services:
     <<: *init-ollama
     image: ollama/ollama:rocm
     depends_on:
-     - ollama-gpu-amd
+      - ollama-gpu-amd

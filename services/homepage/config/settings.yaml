@@ -1,3 +1,4 @@
+---
 providers:
   openweathermap: your_open_weather_api
   weatherapi: your_weather_api
@@ -5,7 +6,7 @@ color: gray
 background:
   image: https://i.imgur.com/5DJSIvq.png
   blur: sm
-  #opacity: 65
+  # opacity: 65
 title: your_title_here
 favicon: your_favicon_here
 iconStyle: theme

@@ -1,46 +1,53 @@
+---
 name: Source protection
-
-on:
+"on":
   workflow_call:
-
+    inputs:
+      commitlint-config:
+        required: false
+        type: string
+        description: "The path to the commitlint configuration file (optional)"
+        default: '.github/.commitlintrc.yml'
+      yamllint-config:
+        required: false
+        type: string
+        description: "The path to the yamllint configuration file (optional)"
+        default: '.github/.yamllintrc.yml'
 permissions:
   contents: 'read'
   pull-requests: 'read'
   checks: 'write'
-
 jobs:
   validate-commits:
     name: Validate Commits
-    runs-on: 'ubuntu-24.04'
+    runs-on: ubuntu-24.04
     steps:
-      - name: Checkout code
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           fetch-depth: 0
-      - name: Commmit lint
-        uses: wagoid/commitlint-github-action@b948419dd99f3fd78a6548d48f94e3df7f6bf3ed
+          persist-credentials: false
+      - name: commitlint
+        uses: >-
+          wagoid/commitlint-github-action@b948419dd99f3fd78a6548d48f94e3df7f6bf3ed
         with:
-          configFile: .github/commitlint.config.cjs
-          failOnErrors: true
-          failOnWarnings: false
-  lint:
-    name: Lint
-    runs-on: 'ubuntu-24.04'
+          configFile: >-
+            ${{
+              inputs.commitlint-config ||
+              '.github/settings/commitlintrc.yml'
+            }}
+
+  validate-yaml:
+    name: Validate YAML
+    runs-on: ubuntu-24.04
     steps:
-      - name: Checkout code
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8
         with:
           fetch-depth: 0
-      - name: Setup  Node.js
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444
-        with:
-          node-version: '22'
-          cache: 'npm'
-      - name: Install dependencies
-        run: npm install
-      - name: Markdown lint
-        run: npm run lint:markdown
-      - name: YAML lint
-        run: npm run lint:yaml
-
-
+          persist-credentials: false
+      - name: yamllint
+        run: |
+          CONFIG="${{ inputs.yamllint-config }}"
+          if [ -z "$CONFIG" ]; then
+            CONFIG=".github/settings/.yamllint.yml"
+          fi
+          docker run --rm -v $(pwd):/data cytopia/yamllint . -c "$CONFIG"

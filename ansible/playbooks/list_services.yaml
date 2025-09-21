@@ -7,7 +7,7 @@
       ansible.builtin.find:
         paths: /opt/
         file_type: directory
-        recurse: no
+        recurse: false
       register: opt_dirs
 
     - name: List directories

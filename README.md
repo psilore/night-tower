@@ -2,6 +2,9 @@
 
 ![tower](/docs/images/tower.png)
 
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
+[![semantic-release](https://img.shields.io/badge/semantic-release-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
+
 ## tailscaled
 
 Services is setup with tailscale as a tailscaled docker sidecar.
