@@ -59,7 +59,7 @@ format_error()  { _format_msg "${FMT_RED}${FMT_BOLD}" "ERROR" "$@"; }
 #   0 on success, non-zero on error
 #######################################
 generate_hosts_ini() {
-  local output_file="hosts.ini"
+  local output_file="ansible/hosts.ini"
   format_log "Generating hosts.ini..."
   echo "[host]" > "${output_file}"
 
