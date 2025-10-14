@@ -55,8 +55,21 @@ sudo apt-get update && sudo apt-get install ansible
        ansible-playbook -i hosts.ini playbooks/prune-backups.yaml
        ```
 
-    - Tailscale maintenance:
+      - Tailscale maintenance:
 
-       ```bash
-       ansible-playbook -i hosts.ini playbooks/tailscale-maintenance.yaml
-       ```
+         ```bash
+         ansible-playbook -i hosts.ini playbooks/tailscale-maintenance.yaml
+         ```
+
+      - Run a specific function (task) in the Tailscale playbook  
+        (e.g., only upgrade Tailscale):
+
+         ```bash
+         ansible-playbook -i hosts.ini playbooks/tailscale-maintenance.yaml --start-at-task "Upgrade Tailscale to latest version"
+         ```
+
+         Or, if you add tags to tasks in the playbook, you can use:
+
+         ```bash
+         ansible-playbook -i hosts.ini playbooks/tailscale-maintenance.yaml --tags upgrade
+         ```
