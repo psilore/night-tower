@@ -1,0 +1,20 @@
+---
+# Playbook to run the prune-backups.sh script on a target host
+- name: Prune old backup files
+  hosts: backup
+  become: true
+  tasks:
+    - name: Ensure prune-backups.sh is present and executable
+      ansible.builtin.copy:
+        src: ../../scripts/host/prune-backups.sh
+        dest: /usr/local/bin/prune-backups.sh
+        mode: '0755'
+
+    - name: Run prune-backups.sh with default options
+      ansible.builtin.command: /usr/local/bin/prune-backups.sh -d /var/backups -p '*.tar.gz' -n 7
+      register: prune_result
+      changed_when: false
+
+    - name: Show prune script output
+      ansible.builtin.debug:
+        var: prune_result.stdout

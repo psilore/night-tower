@@ -28,11 +28,35 @@ sudo apt-get update && sudo apt-get install ansible
    ansible-playbook -i ansible/hosts.ini playbooks/<playbook>.yaml
    ```
 
-   **Playbooks:**  
 
-   ```bash
-   playbooks
-   ├── cleanup_services.yaml
-   ├── list_services.yaml
-   └── update_services.yaml
-   ```
+    **Playbooks:**
+
+    ```
+    playbooks/
+    ├── backup-n8n-workflows.yaml      # Run n8n backup script on n8n hosts
+    ├── prune-backups.yaml             # Prune old backup files on backup hosts
+    ├── tailscale-maintenance.yaml     # Maintain and upgrade Tailscale on tailscale hosts
+    ├── cleanup_services.yaml          # Cleanup unused services
+    ├── list_services.yaml             # List running services
+    └── update_services.yaml           # Update services
+    ```
+
+    **Usage examples:**
+
+    - Run n8n backup:
+
+       ```bash
+       ansible-playbook -i hosts.ini playbooks/backup-n8n-workflows.yaml
+       ```
+
+    - Prune old backups:
+
+       ```bash
+       ansible-playbook -i hosts.ini playbooks/prune-backups.yaml
+       ```
+
+    - Tailscale maintenance:
+
+       ```bash
+       ansible-playbook -i hosts.ini playbooks/tailscale-maintenance.yaml
+       ```

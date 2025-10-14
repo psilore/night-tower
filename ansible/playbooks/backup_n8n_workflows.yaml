@@ -1,0 +1,23 @@
+---
+# Playbook to run the n8n backup script on a target host
+- name: Run n8n backup script
+  hosts: n8n
+  become: true
+  tasks:
+    - name: Ensure backup script is present and executable
+      ansible.builtin.copy:
+        src: ../../scripts/n8n/backup-n8n-workflows.sh
+        dest: /usr/local/bin/backup-n8n-workflows.sh
+        mode: '0755'
+
+    - name: Run n8n backup script
+      ansible.builtin.command:
+        cmd: /usr/local/bin/backup-n8n-workflows.sh
+      register: backup_result
+      # environment:  # Uncomment and set if environment variables are needed
+      #   VAR_NAME: value
+      changed_when: false
+
+    - name: Show backup script output
+      ansible.builtin.debug:
+        var: backup_result.stdout

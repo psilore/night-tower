@@ -1,0 +1,37 @@
+---
+# Playbook to perform maintenance tasks for Tailscale
+- name: Tailscale maintenance
+  hosts: tailscale
+  become: true
+  tasks:
+    - name: Ensure Tailscale is installed
+      ansible.builtin.package:
+        name: tailscale
+        state: present
+
+    - name: Ensure Tailscale service is running
+      ansible.builtin.service:
+        name: tailscaled
+        state: started
+        enabled: true
+
+    - name: Check Tailscale status
+      ansible.builtin.command: tailscale status
+      register: tailscale_status
+      changed_when: false
+
+    - name: Show Tailscale status output
+      ansible.builtin.debug:
+        var: tailscale_status.stdout
+
+    - name: Upgrade Tailscale to latest version
+      ansible.builtin.package:
+        name: tailscale
+        state: latest
+      register: tailscale_upgrade
+
+    - name: Restart Tailscale service if upgraded
+      ansible.builtin.service:
+        name: tailscaled
+        state: restarted
+      when: tailscale_upgrade.changed
