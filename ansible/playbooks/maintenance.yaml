@@ -12,7 +12,8 @@
     - name: Upgrade all packages to the latest version
       ansible.builtin.apt:
         name: "*"
-        state: latest
+        state: present
+        upgrade: full
         autoclean: true
         autoremove: true
       register: apt_update_results

@@ -3,6 +3,12 @@
 - name: Tailscale maintenance
   hosts: night_tower
   become: true
+  handlers:
+    - name: Restart Tailscale
+      ansible.builtin.service:
+        name: tailscaled
+        state: restarted
+
   tasks:
     - name: Ensure Tailscale is installed
       ansible.builtin.package:
@@ -27,11 +33,5 @@
     - name: Upgrade Tailscale to latest version
       ansible.builtin.package:
         name: tailscale
-        state: latest
-      register: tailscale_upgrade
-
-    - name: Restart Tailscale service if upgraded
-      ansible.builtin.service:
-        name: tailscaled
-        state: restarted
-      when: tailscale_upgrade.changed
+        state: present
+      notify: Restart Tailscale

@@ -17,3 +17,5 @@
       args:
         chdir: /opt/{{ item }}
       loop: "{{ docker_services }}"
+      register: docker_update
+      changed_when: docker_update.rc == 0
