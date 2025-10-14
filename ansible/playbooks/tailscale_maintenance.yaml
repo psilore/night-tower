@@ -1,7 +1,7 @@
 ---
 # Playbook to perform maintenance tasks for Tailscale
 - name: Tailscale maintenance
-  hosts: tailscale
+  hosts: night_tower
   become: true
   tasks:
     - name: Ensure Tailscale is installed

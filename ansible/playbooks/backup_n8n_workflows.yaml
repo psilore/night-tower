@@ -1,7 +1,7 @@
 ---
 # Playbook to run the n8n backup script on a target host
 - name: Run n8n backup script
-  hosts: n8n
+  hosts: night_tower
   become: true
   tasks:
     - name: Ensure backup script is present and executable

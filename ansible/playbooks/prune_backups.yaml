@@ -1,7 +1,7 @@
 ---
 # Playbook to run the prune-backups.sh script on a target host
 - name: Prune old backup files
-  hosts: backup
+  hosts: night_tower
   become: true
   tasks:
     - name: Ensure prune-backups.sh is present and executable

@@ -1,7 +1,7 @@
 ---
 # Playbook to maintain (pull, up, prune) a Docker Compose service in /opt/<service-name>/compose.yml
 - name: Maintain Docker Compose service
-  hosts: docker
+  hosts: night_tower
   become: true
   vars:
     service_name: example-service   # Set this via --extra-vars or inventory/group_vars

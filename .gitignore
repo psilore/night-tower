@@ -14,6 +14,9 @@
 .env.test.local
 .env.production.local
 **/hosts.ini
+**/hosts.yml
+**/inventory.ini
+**/inventory.yaml
 
 npm-debug.log*
 yarn-debug.log*
