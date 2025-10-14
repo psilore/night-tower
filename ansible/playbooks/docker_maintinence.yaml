@@ -1,0 +1,42 @@
+---
+# Playbook to maintain (pull, up, prune) a Docker Compose service in /opt/<service-name>/compose.yml
+- name: Maintain Docker Compose service
+  hosts: docker
+  become: true
+  vars:
+    service_name: example-service   # Set this via --extra-vars or inventory/group_vars
+    compose_path: "/opt/{{ service_name }}/compose.yaml"
+  tasks:
+    - name: Ensure docker-compose is installed
+      ansible.builtin.package:
+        name: docker-compose
+        state: present
+
+    - name: Pull latest images for {{ service_name }}
+      ansible.builtin.command: docker-compose -f {{ compose_path }} pull
+      args:
+        chdir: "/opt/{{ service_name }}"
+      register: compose_pull
+      changed_when: "'Downloaded newer image' in compose_pull.stdout or 'Pull complete' in compose_pull.stdout"
+
+    - name: Recreate and start containers for {{ service_name }}
+      ansible.builtin.command: docker-compose -f {{ compose_path }} up -d
+      args:
+        chdir: "/opt/{{ service_name }}"
+      register: compose_up
+      changed_when: false
+
+    - name: Prune unused Docker resources
+      ansible.builtin.command: docker system prune -f
+      register: docker_prune
+      changed_when: false
+
+    - name: Show compose pull output
+      ansible.builtin.debug:
+        var: compose_pull.stdout
+    - name: Show compose up output
+      ansible.builtin.debug:
+        var: compose_up.stdout
+    - name: Show docker prune output
+      ansible.builtin.debug:
+        var: docker_prune.stdout
