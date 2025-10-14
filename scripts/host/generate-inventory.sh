@@ -43,7 +43,8 @@ format_error()  { _format_msg "${FMT_RED}${FMT_BOLD}" "ERROR" "$@"; }
 generate_inventory_yaml() {
   local output_file="ansible/inventory.yaml"
   format_log "Generating inventory.yaml using yq (Python jq wrapper)..."
-  echo "all:" > "$output_file"
+  echo "---" > "$output_file"
+  echo "all:" >> "$output_file"
   echo "  hosts:" >> "$output_file"
 
   local ids
