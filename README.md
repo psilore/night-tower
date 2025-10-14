@@ -4,6 +4,7 @@
 
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 [![semantic-release](https://img.shields.io/badge/semantic-release-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
+[![Main](https://github.com/psilore/night-tower/actions/workflows/main.yaml/badge.svg?branch=main)](https://github.com/psilore/night-tower/actions/workflows/main.yaml)
 
 ## tailscaled
 
