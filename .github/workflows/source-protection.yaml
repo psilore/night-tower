@@ -64,6 +64,6 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@d7cd7cfa2469536527aceaef9ef2ec6f2fb331cb
+        uses: ansible/ansible-lint@61a8e7bad82cc7aee6d0981ea59831a95745795a
         with:
           working_directory: "ansible"
