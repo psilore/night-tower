@@ -38,7 +38,7 @@ jobs:
         uses: rlespinasse/github-slug-action@6f7a8d2348e2a4aa5defafcdaafe5aef3f83bd4b
 
       - name: Semanitic Release
-        uses: cycjimmy/semantic-release-action@9cc899c47e6841430bbaedb43de1560a568dfd16
+        uses: cycjimmy/semantic-release-action@b12c8f6015dc215fe37bc154d4ad456dd3833c90
         id: semantic-release
         with:
           semantic_version: v24.2.1
