@@ -1,22 +1,25 @@
 ---
-# Playbook to perform maintenance tasks for Tailscale
+# Tailscale maintenance: ensure installed, running, and up-to-date.
+# Usage: ansible-playbook -i inventory.yaml playbooks/tailscale_maintenance.yaml -K
 - name: Tailscale maintenance
-  hosts: night_tower
+  hosts: all
   become: true
+
   handlers:
     - name: Restart Tailscale
-      ansible.builtin.service:
+      ansible.builtin.systemd:
         name: tailscaled
         state: restarted
 
   tasks:
-    - name: Ensure Tailscale is installed
+    - name: Ensure Tailscale is installed and up-to-date
       ansible.builtin.package:
         name: tailscale
-        state: present
+        state: latest
+      notify: Restart Tailscale
 
-    - name: Ensure Tailscale service is running
-      ansible.builtin.service:
+    - name: Ensure Tailscale service is running and enabled
+      ansible.builtin.systemd:
         name: tailscaled
         state: started
         enabled: true
@@ -26,12 +29,6 @@
       register: tailscale_status
       changed_when: false
 
-    - name: Show Tailscale status output
+    - name: Display Tailscale status
       ansible.builtin.debug:
-        var: tailscale_status.stdout
-
-    - name: Upgrade Tailscale to latest version
-      ansible.builtin.package:
-        name: tailscale
-        state: present
-      notify: Restart Tailscale
+        msg: "{{ tailscale_status.stdout_lines }}"

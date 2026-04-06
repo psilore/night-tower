@@ -1,0 +1,12 @@
+# ansible/group_vars/all.yml
+# Non-sensitive defaults — safe for public repos.
+# Secrets are loaded from group_vars/vault.yml (encrypted with ansible-vault).
+
+influx_org: "homelab"
+influx_bucket: "debian-lansen"
+
+# These are populated from vault.yml:
+# influx_url:   -> vault_influx_url
+# influx_token: -> vault_influx_token
+influx_url: "{{ vault_influx_url }}"
+influx_token: "{{ vault_influx_token }}"

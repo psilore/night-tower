@@ -1,23 +1,23 @@
 ---
-# Playbook to run the n8n backup script on a target host
-- name: Run n8n backup script
-  hosts: night_tower
+# Run the n8n workflow backup script.
+# Usage: ansible-playbook -i inventory.yaml playbooks/backup_n8n_workflows.yaml -K
+- name: Backup n8n workflows
+  hosts: docker_vms
   become: true
+
   tasks:
-    - name: Ensure backup script is present and executable
+    - name: Deploy backup script
       ansible.builtin.copy:
         src: ../../scripts/n8n/backup-n8n-workflows.sh
         dest: /usr/local/bin/backup-n8n-workflows.sh
-        mode: '0755'
+        mode: "0755"
 
-    - name: Run n8n backup script
+    - name: Run n8n backup
       ansible.builtin.command:
         cmd: /usr/local/bin/backup-n8n-workflows.sh
       register: backup_result
-      # environment:  # Uncomment and set if environment variables are needed
-      #   VAR_NAME: value
-      changed_when: false
+      changed_when: "'backup complete' in backup_result.stdout | lower"
 
-    - name: Show backup script output
+    - name: Display backup output
       ansible.builtin.debug:
-        var: backup_result.stdout
+        msg: "{{ backup_result.stdout_lines }}"

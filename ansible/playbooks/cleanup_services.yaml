@@ -1,41 +1,48 @@
 ---
+# Cleanup unused Docker resources across all Docker hosts.
+# Usage: ansible-playbook -i inventory.yaml playbooks/cleanup_services.yaml -K
 - name: Cleanup unused Docker resources
-  hosts: night_tower
+  hosts: docker_vms
   become: true
 
+  pre_tasks:
+    - name: Verify Docker daemon is running
+      ansible.builtin.systemd:
+        name: docker
+        state: started
+      check_mode: true
+      register: docker_status
+      failed_when: docker_status.status.ActiveState != 'active'
+
   tasks:
-    - name: Prune all unused containers
-      ansible.builtin.command: docker container prune -f
-      register: container_prune_output
-      changed_when: "'Total reclaimed space' in container_prune_output.stdout"
+    - name: Prune stopped containers
+      community.docker.docker_prune:
+        containers: true
+      register: container_result
 
-    - name: Display container cleanup stats
+    - name: Prune unused networks
+      community.docker.docker_prune:
+        networks: true
+      register: network_result
+
+    - name: Prune dangling images
+      community.docker.docker_prune:
+        images: true
+        images_filters:
+          dangling: "true"
+      register: image_result
+
+    - name: Prune unused volumes
+      community.docker.docker_prune:
+        volumes: true
+      register: volume_result
+
+    - name: Display cleanup summary
       ansible.builtin.debug:
-        msg: "{{ container_prune_output.stdout }}"
-
-    - name: Prune all unused networks
-      ansible.builtin.command: docker network prune -f
-      register: network_prune_output
-      changed_when: "'Total reclaimed space' in network_prune_output.stdout"
-
-    - name: Display network cleanup stats
-      ansible.builtin.debug:
-        msg: "{{ network_prune_output.stdout }}"
-
-    - name: Prune all unused images
-      ansible.builtin.command: docker image prune -a -f
-      register: image_prune_output
-      changed_when: "'Total reclaimed space' in image_prune_output.stdout"
-
-    - name: Display image cleanup stats
-      ansible.builtin.debug:
-        msg: "{{ image_prune_output.stdout }}"
-
-    - name: Prune all unused volumes
-      ansible.builtin.command: docker volume prune -f
-      register: volume_prune_output
-      changed_when: "'Total reclaimed space' in volume_prune_output.stdout"
-
-    - name: Display volume cleanup stats
-      ansible.builtin.debug:
-        msg: "{{ volume_prune_output.stdout }}"
+        msg: |
+          === Docker Cleanup Summary ({{ inventory_hostname }}) ===
+          Containers removed: {{ container_result.containers | default([]) | length }}
+          Networks removed:   {{ network_result.networks | default([]) | length }}
+          Images removed:     {{ image_result.images | default([]) | length }}
+          Volumes removed:    {{ volume_result.volumes | default([]) | length }}
+          Space reclaimed:    {{ image_result.images_space_reclaimed | default(0) | human_readable }}

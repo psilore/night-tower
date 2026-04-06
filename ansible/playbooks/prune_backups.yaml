@@ -1,20 +1,30 @@
 ---
-# Playbook to run the prune-backups.sh script on a target host
+# Prune old backup archives.
+# Usage: ansible-playbook -i inventory.yaml playbooks/prune_backups.yaml -K
 - name: Prune old backup files
-  hosts: night_tower
+  hosts: all
   become: true
+  vars:
+    backup_dir: /var/backups
+    backup_pattern: "*.tar.gz"
+    keep_count: 7
+
   tasks:
-    - name: Ensure prune-backups.sh is present and executable
+    - name: Deploy prune-backups script
       ansible.builtin.copy:
         src: ../../scripts/host/prune-backups.sh
         dest: /usr/local/bin/prune-backups.sh
-        mode: '0755'
+        mode: "0755"
 
-    - name: Run prune-backups.sh with default options
-      ansible.builtin.command: /usr/local/bin/prune-backups.sh -d /var/backups -p '*.tar.gz' -n 7
+    - name: Run backup pruning
+      ansible.builtin.command: >-
+        /usr/local/bin/prune-backups.sh
+        -d {{ backup_dir }}
+        -p '{{ backup_pattern }}'
+        -n {{ keep_count }}
       register: prune_result
-      changed_when: false
+      changed_when: "'removed' in prune_result.stdout | lower"
 
-    - name: Show prune script output
+    - name: Display prune output
       ansible.builtin.debug:
-        var: prune_result.stdout
+        msg: "{{ prune_result.stdout_lines }}"

@@ -1,0 +1,18 @@
+# Inventory template for Night-Tower.
+# Copy this file to inventory.yaml and fill in your real values.
+# inventory.yaml is gitignored and will NOT be committed.
+#
+#   cp inventory.yaml.example inventory.yaml
+#
+all:
+  hosts:
+    proxmox-01:
+      ansible_host: <PROXMOX_IP>       # e.g. 10.x.x.x
+      ansible_user: root
+    docker-vm:
+      ansible_host: <DOCKER_VM_IP>     # e.g. 10.x.x.x
+      ansible_user: <YOUR_SUDO_USER>   # e.g. banana-freak
+  children:
+    docker_vms:
+      hosts:
+        docker-vm:

@@ -1,6 +1,8 @@
 ---
-- name: Update services
-  hosts: night_tower
+# Update all Docker Compose services: pull latest images and recreate.
+# Usage: ansible-playbook -i inventory.yaml playbooks/update_services.yaml -K
+- name: Update all Docker services
+  hosts: docker_vms
   become: true
   vars:
     docker_services:
@@ -11,11 +13,28 @@
       - uptime-kuma
       - homepage
       - pi-hole
+
   tasks:
-    - name: Update
-      ansible.builtin.shell: cd /opt/{{ item }} && docker-compose pull && docker-compose up -d
-      args:
-        chdir: /opt/{{ item }}
+    - name: Pull latest images for {{ item }}
+      community.docker.docker_compose_v2_pull:
+        project_src: "/opt/{{ item }}"
       loop: "{{ docker_services }}"
-      register: docker_update
-      changed_when: docker_update.rc == 0
+      register: pull_results
+
+    - name: Recreate containers for {{ item }}
+      community.docker.docker_compose_v2:
+        project_src: "/opt/{{ item }}"
+        state: present
+        recreate: auto
+      loop: "{{ docker_services }}"
+
+    - name: Prune old images after update
+      community.docker.docker_prune:
+        images: true
+        images_filters:
+          dangling: "true"
+      register: prune_result
+
+    - name: Display cleanup summary
+      ansible.builtin.debug:
+        msg: "Space reclaimed: {{ prune_result.images_space_reclaimed | default(0) | human_readable }}"

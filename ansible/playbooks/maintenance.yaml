@@ -1,29 +1,35 @@
 ---
-- name: Maintenance
-  hosts: night_tower
+# System maintenance: update packages, clean up, reboot if needed.
+# Usage: ansible-playbook -i inventory.yaml playbooks/maintenance.yaml -K
+- name: System maintenance
+  hosts: all
   become: true
+  serial: 1 # Rolling updates — one host at a time
 
   tasks:
     - name: Update apt cache
       ansible.builtin.apt:
         update_cache: true
-        cache_valid_time: 3600 # Cache for one hour
+        cache_valid_time: 3600
 
-    - name: Upgrade all packages to the latest version
+    - name: Upgrade all packages (dist-upgrade)
       ansible.builtin.apt:
-        name: "*"
-        state: present
-        upgrade: full
+        upgrade: dist
         autoclean: true
         autoremove: true
-      register: apt_update_results
+      register: apt_upgrade
+
+    - name: Display upgrade summary
+      ansible.builtin.debug:
+        msg: "{{ apt_upgrade.stdout_lines | default(['No changes']) }}"
+      when: apt_upgrade.changed
 
     - name: Check if a reboot is required
       ansible.builtin.stat:
         path: /var/run/reboot-required
       register: reboot_required_file
 
-    - name: Reboot the server if a new kernel was installed
+    - name: Reboot if kernel was updated
       ansible.builtin.reboot:
         msg: "Rebooting due to kernel update"
         connect_timeout: 5

@@ -1,16 +1,18 @@
 ---
-- name: Find and list directories
-  hosts: night_tower
+# List all service directories under /opt/.
+# Usage: ansible-playbook -i inventory.yaml playbooks/list_services.yaml -K
+- name: List deployed services
+  hosts: docker_vms
   become: true
+
   tasks:
-    - name: Get directories
+    - name: Find service directories in /opt
       ansible.builtin.find:
         paths: /opt/
         file_type: directory
         recurse: false
       register: opt_dirs
 
-    - name: List directories
+    - name: Display service directories
       ansible.builtin.debug:
-        msg: "{{ item }}"
-      loop: "{{ opt_dirs.files | map(attribute='path') | list }}"
+        msg: "{{ opt_dirs.files | map(attribute='path') | sort }}"

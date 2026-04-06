@@ -1,0 +1,42 @@
+---
+# We disable 'update_cache' here to prevent crashing if the system is still grumpy
+- name: Ensure gnupg and curl are installed
+  ansible.builtin.apt:
+    name: [gnupg, curl]
+    state: present
+    update_cache: no
+
+- name: Create keyrings directory
+  ansible.builtin.file:
+    path: /usr/share/keyrings
+    state: directory
+    mode: "0755"
+
+- name: Remove stale InfluxData GPG key (force refresh)
+  ansible.builtin.file:
+    path: /usr/share/keyrings/influxdata-archive.gpg
+    state: absent
+
+- name: Download and de-armor current InfluxData GPG key
+  ansible.builtin.shell: |
+    curl -fsSL https://repos.influxdata.com/influxdata-archive.key | gpg --dearmor -o /usr/share/keyrings/influxdata-archive.gpg
+  args:
+    creates: /usr/share/keyrings/influxdata-archive.gpg
+
+- name: Add InfluxData repository (DEB822 Format)
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/influxdata.sources
+    content: |
+      Types: deb
+      URIs: https://repos.influxdata.com/debian
+      Suites: stable
+      Components: main
+      Architectures: amd64
+      Signed-By: /usr/share/keyrings/influxdata-archive.gpg
+    mode: "0644"
+
+- name: Final update and install
+  ansible.builtin.apt:
+    name: [telegraf, lm-sensors, smartmontools]
+    state: present
+    update_cache: yes

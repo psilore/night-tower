@@ -1,0 +1,48 @@
+---
+# Maintain a single Docker Compose service: pull, recreate, prune.
+# Usage: ansible-playbook -i inventory.yaml playbooks/docker_maintenance.yaml -K -e service_name=grafana
+- name: Maintain Docker Compose service
+  hosts: docker_vms
+  become: true
+  vars:
+    service_name: "" # Must be passed via --extra-vars
+
+  pre_tasks:
+    - name: Validate service_name is provided
+      ansible.builtin.assert:
+        that: service_name | length > 0
+        fail_msg: "You must specify a service: -e service_name=<name>"
+
+    - name: Verify compose file exists
+      ansible.builtin.stat:
+        path: "/opt/{{ service_name }}/compose.yaml"
+      register: compose_file
+      failed_when: not compose_file.stat.exists
+
+  tasks:
+    - name: Pull latest images for {{ service_name }}
+      community.docker.docker_compose_v2_pull:
+        project_src: "/opt/{{ service_name }}"
+      register: compose_pull
+
+    - name: Recreate and start {{ service_name }}
+      community.docker.docker_compose_v2:
+        project_src: "/opt/{{ service_name }}"
+        state: present
+        recreate: auto
+      register: compose_up
+
+    - name: Prune dangling images
+      community.docker.docker_prune:
+        images: true
+        images_filters:
+          dangling: "true"
+      register: prune_result
+
+    - name: Display maintenance summary
+      ansible.builtin.debug:
+        msg: |
+          === {{ service_name }} Maintenance ===
+          Images pulled:    {{ compose_pull.actions | default([]) | length }} updates
+          Containers:       {{ compose_up.containers | default([]) | length }} running
+          Space reclaimed:  {{ prune_result.images_space_reclaimed | default(0) | human_readable }}

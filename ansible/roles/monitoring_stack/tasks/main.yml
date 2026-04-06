@@ -1,0 +1,17 @@
+- name: Ensure project directory exists
+  ansible.builtin.file:
+    path: /opt/night-tower
+    state: directory
+    owner: psiloc
+    group: psiloc
+
+- name: Pull latest version of Night Tower from Git
+  ansible.builtin.git:
+    repo: "https://github.com/yourusername/night-tower.git"
+    dest: /opt/night-tower
+    update: yes
+
+- name: Deploy Docker Compose Stack
+  community.docker.docker_compose_v2:
+    project_src: /opt/night-tower
+    state: present

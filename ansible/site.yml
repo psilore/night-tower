@@ -1,0 +1,31 @@
+---
+- name: Apply base configuration to all hosts
+  hosts: all
+  become: yes
+  pre_tasks:
+    - name: Remove stale InfluxData repo source (pre-cleanup)
+      ansible.builtin.file:
+        path: /etc/apt/sources.list.d/influxdata.sources
+        state: absent
+      when: inventory_hostname == 'proxmox-01'
+
+    - name: Remove stale InfluxData GPG key (pre-cleanup)
+      ansible.builtin.file:
+        path: /usr/share/keyrings/influxdata-archive.gpg
+        state: absent
+      when: inventory_hostname == 'proxmox-01'
+  roles:
+    - common # Timezone, Updates, Sudo (Works for everyone)
+
+- name: Configure Hardware Monitoring (Bare Metal Only)
+  hosts: proxmox-01 # <--- ONLY Proxmox gets the repository and binary
+  become: yes
+  roles:
+    - monitoring_agent
+
+- name: Deploy Docker Stack
+  hosts: docker-vm # <--- The VM only handles containers
+  become: yes
+  roles:
+    - docker_host # Ensures Docker is installed
+    - monitoring_stack # Runs your 'docker compose up'

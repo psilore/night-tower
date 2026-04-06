@@ -1,6 +1,0 @@
----
-all:
-  hosts:
-    <host_label>:   # Replace with a label for the host
-      ansible_host: <hostname>
-      ansible_user: <ansibleuser>
