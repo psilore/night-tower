@@ -1,7 +1,7 @@
 ---
 - name: Update apt cache and upgrade all packages
   ansible.builtin.apt:
-    update_cache: yes
+    update_cache: true
     upgrade: dist
     cache_valid_time: 3600
 
@@ -17,7 +17,7 @@
       - unzip
       - ca-certificates
       - gnupg
-      #- software-properties-common
+      # - software-properties-common
     state: present
 
 - name: Set timezone to Europe/Stockholm
@@ -27,7 +27,7 @@
 - name: Ensure NTP (systemd-timesyncd) is running
   ansible.builtin.systemd:
     name: systemd-timesyncd
-    enabled: yes
+    enabled: true
     state: started
 
 - name: Setup passwordless sudo for the admin user

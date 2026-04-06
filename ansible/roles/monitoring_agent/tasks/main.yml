@@ -4,7 +4,7 @@
   ansible.builtin.apt:
     name: [gnupg, curl]
     state: present
-    update_cache: no
+    update_cache: false
 
 - name: Create keyrings directory
   ansible.builtin.file:
@@ -19,7 +19,8 @@
 
 - name: Download and de-armor current InfluxData GPG key
   ansible.builtin.shell: |
-    curl -fsSL https://repos.influxdata.com/influxdata-archive.key | gpg --dearmor -o /usr/share/keyrings/influxdata-archive.gpg
+    curl -fsSL https://repos.influxdata.com/influxdata-archive.key \
+    | gpg --dearmor -o /usr/share/keyrings/influxdata-archive.gpg
   args:
     creates: /usr/share/keyrings/influxdata-archive.gpg
 
@@ -39,4 +40,4 @@
   ansible.builtin.apt:
     name: [telegraf, lm-sensors, smartmontools]
     state: present
-    update_cache: yes
+    update_cache: true

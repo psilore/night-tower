@@ -1,3 +1,4 @@
+---
 - name: Ensure project directory exists
   ansible.builtin.file:
     path: /opt/night-tower
@@ -9,7 +10,7 @@
   ansible.builtin.git:
     repo: "https://github.com/yourusername/night-tower.git"
     dest: /opt/night-tower
-    update: yes
+    update: true
 
 - name: Deploy Docker Compose Stack
   community.docker.docker_compose_v2:

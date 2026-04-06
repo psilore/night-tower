@@ -1,3 +1,4 @@
+---
 # ansible/group_vars/all.yml
 # Non-sensitive defaults — safe for public repos.
 # Secrets are loaded from group_vars/vault.yml (encrypted with ansible-vault).
